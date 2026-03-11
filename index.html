@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMM Pro Planner</title>
+<style>
+body{font-family:Arial;margin:0;background:#0f172a;color:white}
+.container{max-width:1100px;margin:auto;padding:20px}
+header{font-size:26px;font-weight:bold;margin-bottom:20px}
+.card{background:#1e293b;padding:20px;border-radius:12px;margin-bottom:20px}
+input,textarea,select,button{width:100%;padding:10px;margin-top:10px;border-radius:8px;border:none}
+button{background:#22c55e;color:white;font-weight:bold;cursor:pointer}
+button:hover{opacity:0.9}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+.list-item{background:#334155;padding:10px;border-radius:8px;margin-top:10px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="container" id="loginPage">
+<div class="card">
+<h2>Saytga kirish</h2>
+<input id="name" placeholder="Ismingiz">
+<input id="surname" placeholder="Familyangiz">
+<input id="code" placeholder="4 xonali kod" type="password">
+<button onclick="login()">Kirish</button>
+<p id="error" style="color:red"></p>
+</div>
+</div>
+
+<div class="container hidden" id="app">
+<header>SMM PRO PLANNER</header>
+
+<div class="grid">
+
+<div class="card">
+<h3>30 kunlik Kontent Kalendar</h3>
+<input id="calendarDay" placeholder="Kun (1-30)">
+<textarea id="calendarText" placeholder="Qanday kontent"></textarea>
+<button onclick="addCalendar()">Qo'shish</button>
+<div id="calendarList"></div>
+</div>
+
+<div class="card">
+<h3>Instagram Reels g'oya generator</h3>
+<button onclick="generateIdea()">G'oya chiqarish</button>
+<div id="ideaResult" class="list-item"></div>
+</div>
+
+<div class="card">
+<h3>Post qo'yish eng yaxshi vaqt</h3>
+<select id="platform">
+<option>Instagram</option>
+<option>TikTok</option>
+<option>YouTube</option>
+</select>
+<button onclick="bestTime()">Analiz</button>
+<div id="timeResult" class="list-item"></div>
+</div>
+
+<div class="card">
+<h3>Statistika Tracker</h3>
+<input id="views" placeholder="Ko'rishlar">
+<input id="followers" placeholder="Follower soni">
+<button onclick="saveStats()">Saqlash</button>
+<div id="statsList"></div>
+</div>
+
+<div class="card">
+<h3>SMM CRM (Mijozlar)</h3>
+<input id="clientName" placeholder="Mijoz ismi">
+<input id="clientService" placeholder="Xizmat turi">
+<button onclick="addClient()">Qo'shish</button>
+<div id="clientList"></div>
+</div>
+
+</div>
+
+</div>
+
+<script>
+const correctName="Muslimbek";
+const correctSurname="Turg'unboyev";
+const correctCode="8881";
+
+function login(){
+let name=document.getElementById("name").value;
+let surname=document.getElementById("surname").value;
+let code=document.getElementById("code").value;
+
+if(name===correctName && surname===correctSurname && code===correctCode){
+document.getElementById("loginPage").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
+loadData();
+}else{
+document.getElementById("error").innerText="Ma'lumot noto'g'ri";
+}
+}
+
+// CONTENT CALENDAR
+function addCalendar(){
+let day=document.getElementById("calendarDay").value;
+let text=document.getElementById("calendarText").value;
+let data=JSON.parse(localStorage.getItem("calendar")||"[]");
+data.push({day,text});
+localStorage.setItem("calendar",JSON.stringify(data));
+renderCalendar();
+}
+
+function renderCalendar(){
+let data=JSON.parse(localStorage.getItem("calendar")||"[]");
+let list=document.getElementById("calendarList");
+list.innerHTML="";
+
+data.forEach(i=>{
+let div=document.createElement("div");
+div.className="list-item";
+div.innerText="Kun "+i.day+": "+i.text;
+list.appendChild(div);
+});
+}
+
+// IDEA GENERATOR
+const ideas=[
+"Ko'chada odamlar fikri videosi",
+"1 kunlik vlog",
+"Top 5 foydali ilova",
+"Instagram sirli funksiyalar",
+"Oldin va keyin video",
+"Trend ovoz bilan reels",
+"SMM maslahat",
+"Ko'pchilik bilmaydigan lifehack"
+];
+
+function generateIdea(){
+let idea=ideas[Math.floor(Math.random()*ideas.length)];
+document.getElementById("ideaResult").innerText=idea;
+}
+
+// BEST TIME
+function bestTime(){
+let p=document.getElementById("platform").value;
+let result="";
+
+if(p==="Instagram") result="Eng yaxshi vaqt: 18:00 - 21:00";
+if(p==="TikTok") result="Eng yaxshi vaqt: 19:00 - 23:00";
+if(p==="YouTube") result="Eng yaxshi vaqt: 17:00 - 20:00";
+
+document.getElementById("timeResult").innerText=result;
+}
+
+// STATS
+function saveStats(){
+let views=document.getElementById("views").value;
+let followers=document.getElementById("followers").value;
+let data=JSON.parse(localStorage.getItem("stats")||"[]");
+data.push({views,followers});
+localStorage.setItem("stats",JSON.stringify(data));
+renderStats();
+}
+
+function renderStats(){
+let data=JSON.parse(localStorage.getItem("stats")||"[]");
+let list=document.getElementById("statsList");
+list.innerHTML="";
+
+data.forEach(i=>{
+let div=document.createElement("div");
+div.className="list-item";
+div.innerText="Ko'rishlar: "+i.views+" | Followers: "+i.followers;
+list.appendChild(div);
+});
+}
+
+// CRM
+function addClient(){
+let name=document.getElementById("clientName").value;
+let service=document.getElementById("clientService").value;
+let data=JSON.parse(localStorage.getItem("clients")||"[]");
+data.push({name,service});
+localStorage.setItem("clients",JSON.stringify(data));
+renderClients();
+}
+
+function renderClients(){
+let data=JSON.parse(localStorage.getItem("clients")||"[]");
+let list=document.getElementById("clientList");
+list.innerHTML="";
+
+data.forEach(i=>{
+let div=document.createElement("div");
+ div.className="list-item";
+ div.innerText=i.name+" - "+i.service;
+ list.appendChild(div);
+});
+}
+
+function loadData(){
+renderCalendar();
+renderStats();
+renderClients();
+}
+</script>
+
+</body>
+</html>
